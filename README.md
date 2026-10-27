@@ -1,19 +1,21 @@
-# github-sdk
+# @gusnips/github
 
 TypeScript client for the [GitHub REST API](https://docs.github.com/rest), generated from GitHub's OpenAPI description (`2022-11-28`). Zero runtime dependencies.
 
 ```bash
-npm install github-sdk
+npm install @gusnips/github
 # or
-bun add github-sdk
+bun add @gusnips/github
 ```
+
+The `github` and `githubsdk` names on npm belong to other packages, so this client is published as `@gusnips/github`.
 
 ## First call
 
 Public endpoints work without a token (60 requests per hour per IP):
 
 ```ts
-import { GitHubClient } from "github-sdk";
+import { GitHubClient } from "@gusnips/github";
 
 const github = new GitHubClient();
 
@@ -66,7 +68,7 @@ Hover any method in your editor to read GitHub's summary and parameter types.
 A non-2xx response throws `GitHubError`. It includes the HTTP `status`, the parsed `body`, the error `code` when GitHub sends one, and rate-limit headers:
 
 ```ts
-import { GitHubError } from "github-sdk";
+import { GitHubError } from "@gusnips/github";
 
 try {
   await github.repos.get("owner", "missing-repo");

@@ -1,5 +1,5 @@
 {
-  "name": "github-sdk",
+  "name": "@gusnips/github",
   "version": "0.1.0",
   "packageManager": "bun@1.4.2",
   "description": "Zero-dependency TypeScript SDK for the GitHub REST API, generated from GitHub's OpenAPI description",
