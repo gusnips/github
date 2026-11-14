@@ -24,13 +24,14 @@
     "LICENSE"
   ],
   "scripts": {
-    "generate": "bun scripts/generate.ts && prettier --write src",
+    "generate": "bun scripts/generate.ts && oxfmt src",
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint src scripts",
-    "format": "prettier --write .",
+    "format": "oxfmt",
     "test": "bun test",
-    "prepublishOnly": "bun run lint && bun run typecheck && bun run build"
+    "prepublishOnly": "bun run lint && bun run typecheck && bun run build",
+    "format:check": "oxfmt --check"
   },
   "keywords": [
     "github",
@@ -62,8 +63,8 @@
     "@types/bun": "^1.4.2",
     "@types/node": "^26.6.5",
     "openapi-typescript": "7.13.0",
+    "oxfmt": "0.78.0",
     "oxlint": "1.93.0",
-    "prettier": "^3.9.10",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   }
