@@ -1,0 +1,13 @@
+{
+  // The shared preset matches most of the ESLint config this repo had (js recommended +
+  // typescript-eslint recommended, no-undef off, `^_` unused names, no-explicit-any).
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "extends": ["./node_modules/@gusnips/oxlint/base.json"],
+  "plugins": [],
+  "ignorePatterns": ["src/schema.d.ts"],
+  "rules": {
+    // Added to ESLint 10's recommended set, outside oxlint's `correctness`.
+    "no-useless-assignment": "error",
+    "preserve-caught-error": "error"
+  }
+}
