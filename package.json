@@ -27,7 +27,7 @@
     "generate": "bun scripts/generate.ts && prettier --write src",
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src scripts",
+    "lint": "oxlint src scripts",
     "format": "prettier --write .",
     "test": "bun test",
     "prepublishOnly": "bun run lint && bun run typecheck && bun run build"
@@ -58,14 +58,13 @@
     "access": "public"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
+    "@gusnips/oxlint": "^0.2.0",
     "@types/bun": "^1.4.2",
     "@types/node": "^26.6.5",
-    "eslint": "^10.12.0",
     "openapi-typescript": "7.13.0",
+    "oxlint": "1.93.0",
     "prettier": "^3.9.10",
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.71.1"
+    "typescript": "^5.9.3"
   }
 }
