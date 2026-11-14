@@ -25,7 +25,7 @@
   ],
   "scripts": {
     "generate": "bun scripts/generate.ts && oxfmt src",
-    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "build": "tsdown",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint src scripts",
     "format": "oxfmt",
@@ -62,10 +62,9 @@
     "@gusnips/oxlint": "^0.2.0",
     "@types/bun": "^1.4.2",
     "@types/node": "^26.6.5",
-    "openapi-typescript": "7.13.0",
     "oxfmt": "0.78.0",
     "oxlint": "1.93.0",
-    "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
+    "tsdown": "0.23.7",
+    "typescript": "^7.0.2"
   }
 }
