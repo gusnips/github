@@ -1,8 +1,15 @@
 // Reads openapi.json and writes src/schema.d.ts, src/modules/*.ts and src/client.ts.
 // Run it with `bun run generate`. Never edit the files it writes.
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import openapiTS, { astToString, type OpenAPI3 } from "openapi-typescript";
-import ts from "typescript";
+import { execFileSync } from "node:child_process";
+import {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 const HTTP_METHODS = ["get", "post", "put", "patch", "delete"] as const;
 type HttpMethod = (typeof HTTP_METHODS)[number];
@@ -100,7 +107,13 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 const text = readFileSync(SPEC_FILE, "utf8");
-const spec: OpenAPI3 = JSON.parse(text, pruneSpec);
+// The parts of the OpenAPI document this script reads. Everything below narrows them with isRecord.
+interface Spec {
+  paths?: unknown;
+  components?: unknown;
+}
+
+const spec: Spec = JSON.parse(text, pruneSpec);
 const doc: Doc = JSON.parse(text, pruneDoc);
 
 // GitHub's spec puts response examples inside a schema-less requestBody on GET /repos/{owner}/{repo}/contents/{path},
@@ -387,16 +400,42 @@ ${modules.map(({ name, className }) => `    this.${name} = new ${className}(http
 `;
 }
 
-const types = await openapiTS(spec, {
-  transform: (schema) =>
-    schema.format === "binary"
-      ? ts.factory.createTypeReferenceNode("Blob")
-      : undefined,
-});
+// openapi-typescript needs the TypeScript 5 compiler API, which TypeScript 7 does not ship. So
+// typescript 5.9.3 and openapi-typescript 7.13.0 go into a throwaway folder, and scripts/schema.mjs
+// runs against them: the spec goes in on stdin and the types come out on stdout.
+function schemaTypes(spec: Spec): string {
+  const tools = mkdtempSync(join(tmpdir(), "openapi-typescript-"));
+  try {
+    execFileSync(
+      "npm",
+      [
+        "install",
+        "--prefix",
+        tools,
+        "--no-save",
+        "--no-audit",
+        "--no-fund",
+        "typescript@5.9.3",
+        "openapi-typescript@7.13.0",
+      ],
+      { stdio: ["ignore", "ignore", "inherit"] },
+    );
+    return execFileSync("node", ["scripts/schema.mjs", tools], {
+      input: JSON.stringify(spec),
+      encoding: "utf8",
+      maxBuffer: 512 * 1024 * 1024,
+      stdio: ["pipe", "pipe", "inherit"],
+    });
+  } finally {
+    rmSync(tools, { recursive: true, force: true });
+  }
+}
+
+const types = schemaTypes(spec);
 
 rmSync("src/modules", { recursive: true, force: true });
 mkdirSync("src/modules", { recursive: true });
-writeFileSync("src/schema.d.ts", cleanProse(astToString(types)));
+writeFileSync("src/schema.d.ts", cleanProse(types));
 for (const [group, endpoints] of groups) {
   writeFileSync(`src/modules/${group}.ts`, renderModule(group, endpoints));
 }
